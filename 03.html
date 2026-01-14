@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>독도 핵심 용어 사전</title>
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Framer Motion -->
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #e2e8f0;
+        }
+        
+        .serif {
+            font-family: 'Noto Serif KR', serif;
+        }
+        
+        .tab-content {
+            min-height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+        const { motion, AnimatePresence } = window.Motion;
+
+        // 데이터 정의 (Markdown 내용 기반)
+        const glossaryData = {
+            names: [
+                { term: "우산도", sub: "于山島", desc: "삼국시대 우산국에서 유래한 독도의 옛 이름입니다.", source: "[1]" },
+                { term: "석도", sub: "石島", desc: "1900년 대한제국 칙령 제41호에 등장하는 이름입니다. '돌섬(독섬)'을 한자로 표기한 것으로, 독도가 울릉군의 관할임을 보여주는 증거입니다.", source: "[1], [2]" },
+                { term: "마쓰시마", sub: "송도, 松島", desc: "과거 일본이 독도를 부르던 명칭입니다. 당시 일본은 울릉도를 '죽도(다케시마)'라고 불렀습니다.", source: "[3]" },
+                { term: "리앙쿠르암", sub: "Liancourt Rocks", desc: "1849년 프랑스 포경선 리앙쿠르호가 독도를 발견하고 붙인 서양식 명칭입니다.", source: "[4]" }
+            ],
+            documents: [
+                { term: "세종실록지리지", sub: "1454년", desc: "독도(우산)와 울릉도(무릉)가 강원도 울진현에 속하며, 두 섬이 서로 바라볼 수 있다고 기록한 조선의 관찬서입니다.", source: "[5], [6]" },
+                { term: "은주시청합기", sub: "1667년", desc: "일본의 문헌으로, 울릉도와 독도가 일본 영토 밖(조선 땅)임을 스스로 기록한 최초의 일본 문헌입니다.", source: "[5], [7]" },
+                { term: "태정관 지령", sub: "1877년", desc: "일본 메이지 정부의 최고 행정기관인 태정관이 '울릉도와 독도는 일본과 관계없다'고 공식적으로 내린 지시입니다.", source: "[5], [8]" },
+                { term: "대한제국 칙령 제41호", sub: "1900년", desc: "고종 황제가 독도(석도)를 울릉군의 관할 구역으로 명시하여 반포한 근대 법령입니다.", source: "[5], [2]" },
+                { term: "시마네현 고시 제40호", sub: "1905년", desc: "러일전쟁 중 일본이 독도를 주인이 없는 땅이라고 주장하며 불법적으로 자국 영토로 편입한 고시입니다.", source: "[5], [9]" },
+                { term: "SCAPIN 제677호", sub: "1946년", desc: "제2차 세계대전 후 연합군 최고사령관이 독도를 일본의 통치권에서 제외한다고 명시한 지령입니다.", source: "[10]" }
+            ],
+            people: [
+                { term: "안용복", sub: "조선 숙종 때", desc: "조선의 어부로, 일본에 건너가 울릉도와 독도가 조선 땅임을 강력히 주장하여 일본 막부로부터 '울릉도 도해 금지령'을 이끌어냈습니다.", source: "[5], [11]" },
+                { term: "독도의용수비대", sub: "1950년대", desc: "한국전쟁 혼란기에 일본의 침범을 막기 위해 홍순칠 등 민간인들이 자발적으로 결성한 독도 수비 단체입니다.", source: "[5], [12]" },
+                { term: "평화선", sub: "이승만 라인", desc: "1952년 이승만 대통령이 선포한 해양 주권 선언으로, 독도를 포함한 인접 해양에 대한 주권을 명확히 했습니다.", source: "[5], [13]" },
+                { term: "다케시마의 날", sub: "매년 2월 22일", desc: "일본 시마네현이 1905년의 불법 편입을 기념하여 제정한 날로, 한일 갈등의 원인이 되고 있습니다.", source: "[5], [14]" }
+            ]
+        };
+
+        const Icon = ({ name, size = 24, className }) => {
+            const iconRef = React.useRef(null);
+            React.useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons({
+                        icons: { [name]: iconRef.current },
+                        nameAttr: 'data-lucide'
+                    });
+                }
+            }, [name]);
+            return <i data-lucide={name} ref={iconRef} className={className} style={{ width: size, height: size }}></i>;
+        };
+
+        function App() {
+            const [activeTab, setActiveTab] = useState("names");
+
+            const tabs = [
+                { id: "names", label: "명칭 관련", icon: "type" },
+                { id: "documents", label: "핵심 고문서", icon: "scroll" },
+                { id: "people", label: "인물 및 사건", icon: "users" }
+            ];
+
+            return (
+                <div className="min-h-screen bg-slate-900 text-slate-100 selection:bg-indigo-500 selection:text-white">
+                    {/* Navigation Bar */}
+                    <nav className="fixed top-0 left-0 right-0 z-50 p-6 flex justify-between items-start pointer-events-none">
+                        <div className="pointer-events-auto">
+                            <a 
+                                href="index.html" 
+                                className="group flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-900/50 hover:bg-slate-800/80 border border-slate-700/50 text-slate-300 hover:text-white hover:border-indigo-400 transition-all duration-300 backdrop-blur-md shadow-lg"
+                            >
+                                <Icon name="arrow-left" size={16} className="group-hover:-translate-x-1 transition-transform duration-300" />
+                                <span className="text-sm font-medium tracking-wide">메인으로</span>
+                            </a>
+                        </div>
+                    </nav>
+
+                    {/* Header Section */}
+                    <header className="pt-32 pb-12 px-4 text-center relative overflow-hidden">
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-indigo-600/10 rounded-full blur-[100px] -z-10"></div>
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8 }}
+                        >
+                            <span className="text-indigo-400 font-semibold tracking-wider text-sm uppercase mb-3 block">Glossary</span>
+                            <h1 className="text-4xl md:text-5xl font-bold mb-6 serif bg-clip-text text-transparent bg-gradient-to-r from-slate-100 to-slate-400 inline-block">
+                                독도 핵심 용어 사전
+                            </h1>
+                            <p className="text-slate-400 max-w-2xl mx-auto leading-relaxed">
+                                올바른 역사를 알기 위해 반드시 기억해야 할<br className="hidden md:block"/>
+                                주요 명칭, 문헌, 그리고 인물과 사건들을 정리했습니다.
+                            </p>
+                        </motion.div>
+                    </header>
+
+                    {/* Tab Navigation */}
+                    <div className="max-w-4xl mx-auto px-4 mb-12">
+                        <div className="flex flex-col md:flex-row bg-slate-800/50 p-1.5 rounded-2xl border border-slate-700/50 backdrop-blur-sm">
+                            {tabs.map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`relative flex items-center justify-center gap-2 flex-1 py-3 px-6 rounded-xl text-sm font-medium transition-all duration-300 ${
+                                        activeTab === tab.id 
+                                        ? "text-white shadow-md" 
+                                        : "text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
+                                    }`}
+                                >
+                                    {activeTab === tab.id && (
+                                        <motion.div
+                                            layoutId="activeTab"
+                                            className="absolute inset-0 bg-indigo-600 rounded-xl"
+                                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                        />
+                                    )}
+                                    <span className="relative z-10 flex items-center gap-2">
+                                        <Icon name={tab.icon} size={18} />
+                                        {tab.label}
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Content Section */}
+                    <main className="max-w-4xl mx-auto px-4 pb-24 tab-content">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={activeTab}
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                                transition={{ duration: 0.3 }}
+                                className="grid gap-6 md:grid-cols-2"
+                            >
+                                {glossaryData[activeTab].map((item, index) => (
+                                    <GlossaryCard key={index} item={item} index={index} />
+                                ))}
+                            </motion.div>
+                        </AnimatePresence>
+                    </main>
+
+                     {/* Footer */}
+                    <footer className="text-center text-slate-600 py-8 border-t border-slate-800/50">
+                        <p className="text-xs">데이터 출처: 독도 핵심 용어 사전 (dokdo_glossary.md)</p>
+                    </footer>
+                </div>
+            );
+        }
+
+        function GlossaryCard({ item, index }) {
+            return (
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="group bg-slate-800/40 border border-slate-700 hover:border-indigo-500/50 rounded-2xl p-6 transition-all duration-300 hover:bg-slate-800/60 hover:shadow-xl hover:shadow-indigo-500/10 hover:-translate-y-1 relative overflow-hidden"
+                >
+                    <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <Icon name="book-open" size={48} className="text-indigo-500" />
+                    </div>
+
+                    <div className="relative z-10">
+                        <div className="flex items-baseline gap-3 mb-3">
+                            <h3 className="text-xl font-bold text-slate-100 group-hover:text-indigo-300 transition-colors">
+                                {item.term}
+                            </h3>
+                            {item.sub && (
+                                <span className="text-xs font-mono text-slate-500 border border-slate-700 rounded px-1.5 py-0.5">
+                                    {item.sub}
+                                </span>
+                            )}
+                        </div>
+                        
+                        <p className="text-slate-400 text-sm leading-relaxed mb-4 min-h-[60px]">
+                            {item.desc}
+                        </p>
+
+                        <div className="flex items-center justify-between pt-4 border-t border-slate-700/50">
+                            <span className="text-xs text-slate-500 flex items-center gap-1">
+                                <Icon name="quote" size={12} />
+                                출처 {item.source}
+                            </span>
+                            <button 
+                                onClick={() => window.open(`https://www.google.com/search?q=독도+${item.term}`, '_blank')}
+                                className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                                검색 <Icon name="external-link" size={10} />
+                            </button>
+                        </div>
+                    </div>
+                </motion.div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
