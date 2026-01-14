@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>독도 아카이브: 대한민국의 아침</title>
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Framer Motion -->
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+        
+        .serif {
+            font-family: 'Noto Serif KR', serif;
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #2dd4bf, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+        const { motion } = window.Motion;
+
+        const Icon = ({ name, size = 24, className }) => {
+            const iconRef = useRef(null);
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons({
+                        icons: { [name]: iconRef.current },
+                        nameAttr: 'data-lucide'
+                    });
+                }
+            }, [name]);
+            return <i data-lucide={name} ref={iconRef} className={className} style={{ width: size, height: size }}></i>;
+        };
+
+        const MenuCard = ({ title, sub, desc, icon, href, color, delay }) => {
+            return (
+                <motion.a 
+                    href={href}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: delay }}
+                    className="group relative flex flex-col p-8 rounded-3xl bg-slate-800/40 border border-slate-700 hover:bg-slate-800/80 hover:border-slate-600 transition-all duration-300 backdrop-blur-sm overflow-hidden hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-2"
+                >
+                    {/* Background Glow */}
+                    <div className={`absolute -right-10 -top-10 w-40 h-40 ${color} rounded-full blur-[80px] opacity-20 group-hover:opacity-30 transition-opacity`}></div>
+                    
+                    <div className="relative z-10 mb-6 flex justify-between items-start">
+                        <div className={`p-4 rounded-2xl bg-slate-900/50 border border-slate-700/50 group-hover:scale-110 transition-transform duration-300`}>
+                            <Icon name={icon} size={32} className="text-slate-200" />
+                        </div>
+                        <Icon name="arrow-up-right" size={24} className="text-slate-600 group-hover:text-white transition-colors" />
+                    </div>
+                    
+                    <div className="relative z-10 mt-auto">
+                        <span className="text-xs font-bold tracking-wider uppercase text-slate-500 mb-2 block">{sub}</span>
+                        <h3 className="text-2xl font-bold text-slate-100 mb-3 group-hover:text-white transition-colors">{title}</h3>
+                        <p className="text-slate-400 text-sm leading-relaxed group-hover:text-slate-300 transition-colors">
+                            {desc}
+                        </p>
+                    </div>
+                </motion.a>
+            );
+        };
+
+        function App() {
+            return (
+                <div className="min-h-screen relative flex flex-col">
+                    
+                    {/* Background Ambience */}
+                    <div className="fixed inset-0 z-0 pointer-events-none">
+                        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-900/20 rounded-full blur-[120px]"></div>
+                        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-teal-900/20 rounded-full blur-[120px]"></div>
+                    </div>
+
+                    {/* Header / Hero */}
+                    <header className="relative z-10 pt-24 pb-12 px-6 text-center max-w-4xl mx-auto">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 1 }}
+                            className="inline-block mb-6 px-4 py-1.5 rounded-full border border-slate-700 bg-slate-800/50 backdrop-blur-md"
+                        >
+                            <span className="text-xs font-semibold tracking-widest text-teal-400 uppercase">Dokdo Archive Project</span>
+                        </motion.div>
+                        
+                        <motion.h1 
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.2 }}
+                            className="text-5xl md:text-7xl font-black mb-8 serif tracking-tight text-slate-100"
+                        >
+                            대한민국의 아침,<br />
+                            <span className="gradient-text">독도</span>에서 시작됩니다.
+                        </motion.h1>
+                        
+                        <motion.p 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.8, delay: 0.4 }}
+                            className="text-lg md:text-xl text-slate-400 leading-relaxed max-w-2xl mx-auto"
+                        >
+                            역사적 진실과 지리적 사실, 그리고 우리가 지켜야 할 가치.<br className="hidden md:block"/>
+                            독도에 대한 모든 기록을 이곳에서 확인하세요.
+                        </motion.p>
+                    </header>
+
+                    {/* Main Grid Navigation */}
+                    <main className="relative z-10 flex-grow px-4 pb-24">
+                        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <MenuCard 
+                                href="01.html"
+                                title="지리적 진실과 정책"
+                                sub="Policy & Truth"
+                                desc="독도가 왜 대한민국의 영토인지 지리적 특성과 기후 데이터를 통해 논리적으로 확인합니다."
+                                icon="map"
+                                color="bg-teal-500"
+                                delay={0.6}
+                            />
+                            <MenuCard 
+                                href="02.html"
+                                title="독도 역사 연대기"
+                                sub="History Timeline"
+                                desc="512년 이사부의 우산국 정복부터 현재까지, 기록으로 증명되는 독도의 역사를 탐험합니다."
+                                icon="history"
+                                color="bg-indigo-500"
+                                delay={0.7}
+                            />
+                            <MenuCard 
+                                href="03.html"
+                                title="핵심 용어 사전"
+                                sub="Glossary"
+                                desc="안용복, 태정관 지령, SCAPIN 등 독도를 이해하기 위해 꼭 알아야 할 핵심 용어들을 정리했습니다."
+                                icon="book-open"
+                                color="bg-amber-500"
+                                delay={0.8}
+                            />
+                            <MenuCard 
+                                href="04.html"
+                                title="소통과 의견 수렴"
+                                sub="Community"
+                                desc="독도에 대한 여러분의 생각과 응원 메시지를 남기고, 더 나은 미래를 위해 함께 소통하는 공간입니다."
+                                icon="message-circle"
+                                color="bg-pink-500"
+                                delay={0.9}
+                            />
+                        </div>
+                    </main>
+
+                    {/* Footer */}
+                    <footer className="relative z-10 py-8 text-center border-t border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                        <div className="flex justify-center items-center gap-2 mb-4 text-slate-500">
+                            <Icon name="anchor" size={16} />
+                            <span className="text-sm font-semibold tracking-wider">DOKDO IS KOREAN TERRITORY</span>
+                        </div>
+                        <p className="text-xs text-slate-600">
+                            © 2026 Dokdo Archive Project. All rights reserved.
+                        </p>
+                    </footer>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
